@@ -1,0 +1,3 @@
+const CLOUDNARY_SECRET = "rI5DCmrGV1zFgDVPBHHvkgBd348"
+
+export default CLOUDNARY_SECRET;

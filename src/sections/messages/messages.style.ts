@@ -1,0 +1,103 @@
+export const styles = {
+  messageWrap: {
+    height: '600px',
+    py: "12px",
+  },
+  chat: {
+    minHeight: "450px",
+    maxHeight: "450px",
+    overflowY: "auto",
+
+  },
+  content: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "14px",
+    cursor: "pointer",
+    border: "1px solid #EAEAEA",
+    px: "13px",
+    py: "22px",
+    mb: "12px",
+    borderRadius: "6px",
+    "&:hover": {
+      backgroundColor: "secondary.main",
+      "& p, h6": {
+        color: "#fff",
+      },
+    },
+  },
+  date: {
+    fontSize: "12px",
+    color: "secondary.main",
+    whiteSpace: "nowrap",
+  },
+  usersWrapper: {
+    border: "1px solid #EAEAEA",
+    py: "27px",
+    px: "16px",
+    borderRadius: "6px",
+    height: '700px',
+  },
+  messageContent: {
+    display: "flex",
+    gap: "25px",
+  },
+  profile: {
+    display: "flex",
+    alignItems: "center",
+    gap: "19px",
+    px: "27px",
+    pb: "12px",
+  },
+  featuredMessage: () => ({
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+    justifyContent: "flex-start",
+    mb: "25px",
+    px: "15px",
+  }),
+  featuredMessage2: () => ({
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+    justifyContent: "flex-end",
+    mb: "25px",
+    px: "15px",
+  }),
+  doctorMessage: {
+    color: "info.main",
+    backgroundColor: "grey.300",
+    borderRadius: "6px",
+    p: "8px 12px",
+    fontWeight: 500,
+    width: "170px",
+  },
+  patientMessage: {
+    color: "info.main",
+    border: "1px solid #FF414D",
+    borderRadius: "6px",
+    p: "8px 12px",
+    fontWeight: 500,
+    width: "170px",
+  },
+  chatWrap: {
+    background: "#F2F2F2",
+    padding: "10px 20px",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    borderRadius: "0px 0px 20px 20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+  },
+  time: {
+    fontWeight: 500,
+    color: "grey.500",
+    textAlign: 'right',
+    display: "flex",
+    justifyContent: 'flex-end'
+  },
+};

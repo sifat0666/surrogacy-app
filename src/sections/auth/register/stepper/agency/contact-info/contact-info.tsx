@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from "react";
+import { FormProvider } from "@/components/rhf";
+import { RHFUploadSingleFileWithPreview } from "@/components/rhf/rhf-upload";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import { useSelector } from "react-redux";
+import { useRegisterAgencyMutation } from "@/services/auth-api";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Spinner from "@/components/Spinner/Spinner";
+
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
+
+
+const ContactInfo = ({ handleChange }: { handleChange: () => void }) => {
+  const [mutation] = useRegisterAgencyMutation();
+  const [image, setImage] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<any | null>(null);
+
+
+  const user_data = useSelector((state: any) => state.user);
+  const route = useRouter();
+
+  const methods = useForm({
+    resolver: yupResolver(
+      Yup.object({
+        image: Yup.mixed().required("Required Field!"),
+      })
+    ),
+    defaultValues: {
+      image: "",
+    },
+  });
+
+  const { handleSubmit } = methods;
+
+  const onSubmit = async (values: any) => {
+
+    // check if the image is not empty
+    if (!values?.image) {
+      return toast.error("Almost done! Just need your photo to complete your registration.");
+    }
+
+    setLoading(true);
+    const image = values?.image;
+    setImage(image);
+    const image_url = await UploadImageToCloud(image);
+
+    try {
+      const { meta, identity } = user_data?.details;
+
+      const formData = new FormData();
+      formData.append("user_type", "Agency");
+      formData.append("name", identity?.name);
+      formData.append("email", user_data?.email);
+      formData.append("password", user_data?.password);
+      formData.append("password_confirmation", user_data?.password_confirmation);
+      formData.append("state", identity?.state);
+      formData.append("country", identity?.country);
+      formData.append("assisted_groups", meta?.assisted_groups);
+      formData.append("services_provided", meta?.services_provider);
+      formData.append("surrogate_matching_time", meta?.surrogate_matching_time);
+      formData.append("membership_affilations", meta?.membership_affilations);
+      formData.append("journey_length", meta?.journey_length);
+      formData.append("images", image_url);
+
+      await mutation(formData).unwrap();
+      setLoading(false);
+      route.push('/login');
+      toast.success("Registration successful!");
+    } catch (error: any) {
+      setLoading(false);
+      console.error("Error submitting form:", error);
+      toast.error(error.message || "Registration not successful!");
+    }
+  };
+
+
+  const UploadImageToCloud = async (image_file: any) => {
+    const image_selected = image_file;
+    setImage(image_selected);
+
+    try {
+      if (!image_selected) {
+        return;
+      }
+      const formData2 = new FormData();
+      formData2.append("file", image_selected);
+      formData2.append("upload_preset", "w2fsqv0e");
+      try {
+        const response = await fetch(' https://api.cloudinary.com/v1_1/dl8ppbbgu/image/upload', {
+          method: 'POST',
+          body: formData2,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest', // This header might be required by Cloudinary
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setImage(data.secure_url);
+          return data.secure_url;
+        } else {
+          console.error('Failed to upload image:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+
+    } catch (error: any) {
+    }
+  }
+
+
+  useEffect(() => {
+    const image = methods.watch("image");
+    if (image && typeof image !== "string") {
+      setPreviewImage(URL.createObjectURL(image));
+    } else {
+      setPreviewImage(null);
+    }
+  }, [methods.watch("image")]);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      methods.setValue("image", file);
+    }
+  };
+
+  return (
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={3} justifyContent="center" alignItems="center" sx={{ paddingX: { xs: '10px', sm: 0 } }}>
+        {loading && <Spinner />}
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Typography variant="caption" fontWeight={700} color="info.main">
+              Upload a Photo
+            </Typography>
+            <Tooltip
+              title="It is recommended to upload a profile picture of yourself or your family, preferably a face photo, as this increases trust and reliability. Surrogates are unlikely to contact a member without a profile photo."
+              color="red"
+              placement="right"
+              arrow
+            >
+              <IconButton>
+                <InfoIcon
+                  sx={{
+                    color: "gray",
+                    fontSize: "1rem"
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt="Preview"
+              style={{ width: "150px", marginTop: "10px", borderRadius: "50%", height: "150px", objectFit: "cover" }}
+              onClick={() => document?.getElementById('imageInput').click()} />
+          ) : (
+            <RHFUploadSingleFileWithPreview
+              name="image"
+              accept={{ "image/*": [] }}
+              type="image"
+              sx={styles.contactWrapper}
+              isUploadIcon
+            />
+          )}
+          <input
+            type="file"
+            id="imageInput"
+            style={{ display: 'none' }}
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </Box>
+        <Box>
+          <Button variant="contained" type="submit" sx={{ backgroundColor: "#FF414D !important", width: "100%" }}>
+            GET STARTED
+          </Button>
+        </Box>
+      </Stack>
+    </FormProvider>
+  );
+};
+
+export default ContactInfo;
+
+const styles = {
+  contactWrapper: {
+    mt: "10px",
+    "& > div": {
+      border: "1px dashed #B0B0B0",
+      borderRadius: "100px",
+      width: "100px",
+      height: "40px",
+      padding: "40px 8px",
+      "& span": {
+        display: "none",
+        margin: 0,
+        padding: 0,
+      },
+    },
+  },
+};

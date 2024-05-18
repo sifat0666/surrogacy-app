@@ -1,0 +1,27 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.fit-cover {
+  @media (max-width: "768px") {
+    object-fit: cover;
+    border-radius: 12px;
+  }
+}
+
+.font-grotesk {
+  font-family: 'CabinetGrotesk-Variable' !important;
+}
+
+
+::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #FF414D !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e1e1 !important;
+}

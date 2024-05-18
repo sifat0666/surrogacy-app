@@ -1,0 +1,39 @@
+@import '../assets/scss/_fonts.scss';
+@import '../assets/scss/_common.scss';
+
+*,
+body {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+p,
+h4,
+h5,
+h6,
+span,
+strong,
+ul,
+li,
+button,
+svg,
+input,
+select,
+option,
+div,
+tr,
+td,
+th,
+table,
+thead,
+tbody,
+label {
+  font-family: 'Satoshi-Variable' !important;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'CabinetGrotesk-Variable' !important;
+}
